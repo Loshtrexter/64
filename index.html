@@ -4,224 +4,162 @@
 <meta charset="utf-8">
 <title>Super Mario 64</title>
 <style>
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #111;
-    font-family: Arial, sans-serif;
+body, html{
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #111;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  image-rendering: pixelated;
+  scrollbar-width: none;
 }
+::-webkit-scrollbar { display: none; }
+
+#container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 canvas {
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-    image-rendering: pixelated;
-    display: block;
+  width: 100vw;
+  height: 100vh;
 }
 
-/* --- Mobile Controls --- */
-#controls {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 999;
-}
-#dpad, #cstick, #actions, #topControls {
-    pointer-events: auto;
-    position: absolute;
-}
-#dpad {
-    bottom: 20px;
-    left: 20px;
-    display: grid;
-    grid-template-columns: 60px 60px 60px;
-    grid-template-rows: 60px 60px 60px;
-    gap: 5px;
-}
-#dpad .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } 
-#dpad .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } 
-#dpad .control-btn:nth-child(5) { grid-column: 2; grid-row: 2; } 
-#dpad .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } 
-#dpad .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } 
-
-#cstick {
-    bottom: 20px;
-    right: 120px;
-    display: grid;
-    grid-template-columns: 60px 60px 60px;
-    grid-template-rows: 60px 60px 60px;
-    gap: 5px;
-}
-#cstick .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; }
-#cstick .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; }
-#cstick .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; }
-#cstick .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; }
-
-#actions {
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+#mobile-controls {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 999;
 }
 
-#topControls {
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.dpad, .cstick, .buttons, .start-btn {
+  pointer-events: auto;
+  display: flex;
+  gap: 10px;
 }
 
-.control-btn {
-    width: 60px;
-    height: 60px;
-    background: rgba(255,255,255,0.2);
-    border: 2px solid white;
-    border-radius: 50%;
-    color: white;
-    font-weight: bold;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
+.dpad, .cstick {
+  flex-direction: column;
+  margin-left: 10px;
 }
-.control-btn:active {
-    background: rgba(255,255,255,0.5);
+
+.buttons {
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.start-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  pointer-events: auto;
+}
+
+.btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  user-select: none;
+  touch-action: none;
+}
+.btn:active {
+  background: rgba(255,255,255,0.4);
 }
 </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
 
-<div id="controls">
-    <div id="dpad">
-        <div></div>
-        <div class="control-btn" data-key="w">↑</div>
-        <div></div>
-        <div class="control-btn" data-key="a">←</div>
-        <div></div>
-        <div class="control-btn" data-key="d">→</div>
-        <div></div>
-        <div class="control-btn" data-key="s">↓</div>
-        <div></div>
-    </div>
-
-    <div id="cstick">
-        <div></div>
-        <div class="control-btn" data-key="ArrowUp">↑</div>
-        <div></div>
-        <div class="control-btn" data-key="ArrowLeft">←</div>
-        <div></div>
-        <div class="control-btn" data-key="ArrowRight">→</div>
-        <div></div>
-        <div class="control-btn" data-key="ArrowDown">↓</div>
-        <div></div>
-    </div>
-
-    <div id="actions">
-        <div class="control-btn" data-key="l">A</div>
-        <div class="control-btn" data-key=",">B</div>
-        <div class="control-btn" data-key="k">Z</div>
-        <div class="control-btn" data-key="ShiftRight">R</div>
-    </div>
-
-    <div id="topControls">
-        <div class="control-btn" data-key=" ">Start</div>
-    </div>
+<div id="container">
+  <canvas class="emscripten" id="canvas"></canvas>
 </div>
 
-<script>
-const canvas = document.getElementById('canvas');
+<!-- Mobile Controls -->
+<div id="mobile-controls">
+  <div class="dpad">
+    <div class="btn" data-key="w">↑</div>
+    <div class="btn" data-key="a">←</div>
+    <div class="btn" data-key="s">↓</div>
+    <div class="btn" data-key="d">→</div>
+  </div>
 
-// --- Emscripten Module setup for SM64 ---
+  <div class="cstick">
+    <div class="btn" data-key="ArrowUp">↑</div>
+    <div class="btn" data-key="ArrowLeft">←</div>
+    <div class="btn" data-key="ArrowDown">↓</div>
+    <div class="btn" data-key="ArrowRight">→</div>
+  </div>
+
+  <div class="buttons">
+    <div class="btn" data-key="l">A</div>
+    <div class="btn" data-key=",">B</div>
+    <div class="btn" data-key="k">Z</div>
+    <div class="btn" data-key="ShiftRight">R</div>
+  </div>
+
+  <div class="start-btn">
+    <div class="btn" data-key=" ">Start</div>
+  </div>
+</div>
+
+<script type='text/javascript'>
 var Module = {
   preRun: [],
   postRun: [],
-  print: function(text){ console.log(text); },
-  printErr: function(text){ console.error(text); },
+  print: function(text) { console.log(text); },
+  printErr: function(text) { console.error(text); },
   canvas: (function() {
-      var c = document.getElementById('canvas');
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
-      c.addEventListener("webglcontextlost", function(e){
-          alert("WebGL context lost. Reload page.");
+      var canvas = document.getElementById('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.addEventListener("webglcontextlost", function(e) {
+          alert('WebGL context lost. You will need to reload the page.');
           e.preventDefault();
       }, false);
-      return c;
+      return canvas;
   })(),
-  setStatus: function(text){}
+  setStatus: function(text) {}
 };
 
-// --- Touch Controls ---
+// Mobile touch controls
 const activeKeys = new Set();
-const buttons = document.querySelectorAll('.control-btn');
-
-function keyCodeFor(code){
-  switch(code){
-    case 'w': return 87;
-    case 'a': return 65;
-    case 's': return 83;
-    case 'd': return 68;
-    case 'l': return 76;
-    case ',': return 188;
-    case 'k': return 75;
-    case 'ShiftRight': return 16;
-    case 'ArrowUp': return 38;
-    case 'ArrowDown': return 40;
-    case 'ArrowLeft': return 37;
-    case 'ArrowRight': return 39;
-    case ' ': return 32;
-    default: return 0;
-  }
-}
-
-function sendKey(code, type){
-  const event = new KeyboardEvent(type, { code, key: code });
-  Object.defineProperty(event, 'keyCode', { get: ()=>keyCodeFor(code) });
-  Object.defineProperty(event, 'which', { get: ()=>keyCodeFor(code) });
-  window.dispatchEvent(event);
-}
-
-buttons.forEach(btn=>{
+document.querySelectorAll('.btn').forEach(btn => {
   const key = btn.dataset.key;
-  btn.addEventListener('touchstart', e=>{
+  btn.addEventListener('touchstart', e => {
     e.preventDefault();
-    if(!activeKeys.has(key)){
+    if (!activeKeys.has(key)) {
       activeKeys.add(key);
-      sendKey(key,'keydown');
+      document.dispatchEvent(new KeyboardEvent('keydown', {key:key, code:key}));
     }
-  }, {passive:false});
-
-  btn.addEventListener('touchend', e=>{
+  });
+  btn.addEventListener('touchend', e => {
     e.preventDefault();
-    if(activeKeys.has(key)){
+    if (activeKeys.has(key)) {
       activeKeys.delete(key);
-      sendKey(key,'keyup');
+      document.dispatchEvent(new KeyboardEvent('keyup', {key:key, code:key}));
     }
-  }, {passive:false});
-
-  btn.addEventListener('touchcancel', e=>{
+  });
+  btn.addEventListener('touchcancel', e => {
     e.preventDefault();
-    if(activeKeys.has(key)){
+    if (activeKeys.has(key)) {
       activeKeys.delete(key);
-      sendKey(key,'keyup');
+      document.dispatchEvent(new KeyboardEvent('keyup', {key:key, code:key}));
     }
-  }, {passive:false});
-});
-
-// --- Resize canvas after SM64 loads ---
-window.addEventListener('resize', function(){
-  Module.canvas.width = window.innerWidth;
-  Module.canvas.height = window.innerHeight;
+  });
 });
 </script>
 
