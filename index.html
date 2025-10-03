@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Super Mario 64</title>
 <style>
-  html, body {
+html, body {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -12,76 +12,73 @@
     overflow: hidden;
     background: #111;
     font-family: Arial, sans-serif;
-  }
-
-  canvas {
+}
+canvas {
     width: 100%;
     height: 100%;
     touch-action: none;
     image-rendering: pixelated;
     display: block;
-  }
+}
 
-  /* --- Mobile Controls --- */
-  #controls {
+/* --- Mobile Controls --- */
+#controls {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* parent ignores touches */
+    pointer-events: none;
     z-index: 999;
-  }
-
-  #dpad, #cstick, #actions, #topControls {
-    pointer-events: auto; /* children are touchable */
+}
+#dpad, #cstick, #actions, #topControls {
+    pointer-events: auto;
     position: absolute;
-  }
-
-  #dpad {
+}
+#dpad {
     bottom: 20px;
     left: 20px;
     display: grid;
     grid-template-columns: 60px 60px 60px;
     grid-template-rows: 60px 60px 60px;
     gap: 5px;
-  }
-  #dpad .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } /* up */
-  #dpad .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } /* left */
-  #dpad .control-btn:nth-child(5) { grid-column: 2; grid-row: 2; } /* center placeholder */
-  #dpad .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } /* right */
-  #dpad .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } /* down */
+}
+#dpad .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } 
+#dpad .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } 
+#dpad .control-btn:nth-child(5) { grid-column: 2; grid-row: 2; } 
+#dpad .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } 
+#dpad .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } 
 
-  #cstick {
+#cstick {
     bottom: 20px;
     right: 120px;
     display: grid;
     grid-template-columns: 60px 60px 60px;
     grid-template-rows: 60px 60px 60px;
     gap: 5px;
-  }
-  #cstick .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } /* up */
-  #cstick .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } /* left */
-  #cstick .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } /* right */
-  #cstick .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } /* down */
+}
+#cstick .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; }
+#cstick .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; }
+#cstick .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; }
+#cstick .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; }
 
-  #actions {
+#actions {
     bottom: 20px;
     right: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
+}
 
-  #topControls {
+#topControls {
     top: 20px;
     right: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
+}
 
-  .control-btn {
+.control-btn {
     width: 60px;
     height: 60px;
     background: rgba(255,255,255,0.2);
@@ -96,124 +93,136 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
-  }
-
-  .control-btn:active {
+}
+.control-btn:active {
     background: rgba(255,255,255,0.5);
-  }
+}
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
 
-<!-- Mobile Controls -->
 <div id="controls">
-  <!-- Left D-pad for movement -->
-  <div id="dpad">
-    <div></div>
-    <div class="control-btn" data-key="w">↑</div>
-    <div></div>
-    <div class="control-btn" data-key="a">←</div>
-    <div></div>
-    <div class="control-btn" data-key="d">→</div>
-    <div></div>
-    <div class="control-btn" data-key="s">↓</div>
-    <div></div>
-  </div>
+    <div id="dpad">
+        <div></div>
+        <div class="control-btn" data-key="w">↑</div>
+        <div></div>
+        <div class="control-btn" data-key="a">←</div>
+        <div></div>
+        <div class="control-btn" data-key="d">→</div>
+        <div></div>
+        <div class="control-btn" data-key="s">↓</div>
+        <div></div>
+    </div>
 
-  <!-- Right C-stick -->
-  <div id="cstick">
-    <div></div>
-    <div class="control-btn" data-key="ArrowUp">↑</div>
-    <div></div>
-    <div class="control-btn" data-key="ArrowLeft">←</div>
-    <div></div>
-    <div class="control-btn" data-key="ArrowRight">→</div>
-    <div></div>
-    <div class="control-btn" data-key="ArrowDown">↓</div>
-    <div></div>
-  </div>
+    <div id="cstick">
+        <div></div>
+        <div class="control-btn" data-key="ArrowUp">↑</div>
+        <div></div>
+        <div class="control-btn" data-key="ArrowLeft">←</div>
+        <div></div>
+        <div class="control-btn" data-key="ArrowRight">→</div>
+        <div></div>
+        <div class="control-btn" data-key="ArrowDown">↓</div>
+        <div></div>
+    </div>
 
-  <!-- Action buttons -->
-  <div id="actions">
-    <div class="control-btn" data-key="l">A</div>
-    <div class="control-btn" data-key=",">B</div>
-    <div class="control-btn" data-key="k">Z</div>
-    <div class="control-btn" data-key="ShiftRight">R</div>
-  </div>
+    <div id="actions">
+        <div class="control-btn" data-key="l">A</div>
+        <div class="control-btn" data-key=",">B</div>
+        <div class="control-btn" data-key="k">Z</div>
+        <div class="control-btn" data-key="ShiftRight">R</div>
+    </div>
 
-  <!-- Start button -->
-  <div id="topControls">
-    <div class="control-btn" data-key=" ">Start</div>
-  </div>
+    <div id="topControls">
+        <div class="control-btn" data-key=" ">Start</div>
+    </div>
 </div>
 
 <script>
-  const activeKeys = new Set();
-  const buttons = document.querySelectorAll('.control-btn');
+const canvas = document.getElementById('canvas');
 
-  function keyCodeFor(code) {
-    switch(code) {
-      case 'w': return 87;
-      case 'a': return 65;
-      case 's': return 83;
-      case 'd': return 68;
-      case 'l': return 76;  // A
-      case ',': return 188; // B
-      case 'k': return 75;  // Z
-      case 'ShiftRight': return 16;
-      case 'ArrowUp': return 38;
-      case 'ArrowDown': return 40;
-      case 'ArrowLeft': return 37;
-      case 'ArrowRight': return 39;
-      case ' ': return 32; // Start
-      default: return 0;
+// --- Emscripten Module setup for SM64 ---
+var Module = {
+  preRun: [],
+  postRun: [],
+  print: function(text){ console.log(text); },
+  printErr: function(text){ console.error(text); },
+  canvas: (function() {
+      var c = document.getElementById('canvas');
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+      c.addEventListener("webglcontextlost", function(e){
+          alert("WebGL context lost. Reload page.");
+          e.preventDefault();
+      }, false);
+      return c;
+  })(),
+  setStatus: function(text){}
+};
+
+// --- Touch Controls ---
+const activeKeys = new Set();
+const buttons = document.querySelectorAll('.control-btn');
+
+function keyCodeFor(code){
+  switch(code){
+    case 'w': return 87;
+    case 'a': return 65;
+    case 's': return 83;
+    case 'd': return 68;
+    case 'l': return 76;
+    case ',': return 188;
+    case 'k': return 75;
+    case 'ShiftRight': return 16;
+    case 'ArrowUp': return 38;
+    case 'ArrowDown': return 40;
+    case 'ArrowLeft': return 37;
+    case 'ArrowRight': return 39;
+    case ' ': return 32;
+    default: return 0;
+  }
+}
+
+function sendKey(code, type){
+  const event = new KeyboardEvent(type, { code, key: code });
+  Object.defineProperty(event, 'keyCode', { get: ()=>keyCodeFor(code) });
+  Object.defineProperty(event, 'which', { get: ()=>keyCodeFor(code) });
+  window.dispatchEvent(event);
+}
+
+buttons.forEach(btn=>{
+  const key = btn.dataset.key;
+  btn.addEventListener('touchstart', e=>{
+    e.preventDefault();
+    if(!activeKeys.has(key)){
+      activeKeys.add(key);
+      sendKey(key,'keydown');
     }
-  }
+  }, {passive:false});
 
-  function sendKey(code, type) {
-    const event = new KeyboardEvent(type, { code, key: code });
-    Object.defineProperty(event, 'keyCode', { get: () => keyCodeFor(code) });
-    Object.defineProperty(event, 'which', { get: () => keyCodeFor(code) });
-    window.dispatchEvent(event);
-  }
+  btn.addEventListener('touchend', e=>{
+    e.preventDefault();
+    if(activeKeys.has(key)){
+      activeKeys.delete(key);
+      sendKey(key,'keyup');
+    }
+  }, {passive:false});
 
-  buttons.forEach(btn => {
-    const key = btn.dataset.key;
+  btn.addEventListener('touchcancel', e=>{
+    e.preventDefault();
+    if(activeKeys.has(key)){
+      activeKeys.delete(key);
+      sendKey(key,'keyup');
+    }
+  }, {passive:false});
+});
 
-    btn.addEventListener('touchstart', e => {
-      e.preventDefault();
-      if (!activeKeys.has(key)) {
-        activeKeys.add(key);
-        sendKey(key, 'keydown');
-      }
-    }, {passive:false});
-
-    btn.addEventListener('touchend', e => {
-      e.preventDefault();
-      if (activeKeys.has(key)) {
-        activeKeys.delete(key);
-        sendKey(key, 'keyup');
-      }
-    }, {passive:false});
-
-    btn.addEventListener('touchcancel', e => {
-      e.preventDefault();
-      if (activeKeys.has(key)) {
-        activeKeys.delete(key);
-        sendKey(key, 'keyup');
-      }
-    }, {passive:false});
-  });
-
-  // Resize canvas
-  const canvas = document.getElementById('canvas');
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+// --- Resize canvas after SM64 loads ---
+window.addEventListener('resize', function(){
+  Module.canvas.width = window.innerWidth;
+  Module.canvas.height = window.innerHeight;
+});
 </script>
 
 <script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
