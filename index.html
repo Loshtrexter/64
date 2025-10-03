@@ -1,199 +1,221 @@
 <!doctype html>
 <html lang="en-us">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Super Mario 64</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #111;
-      font-family: Arial, Helvetica, sans-serif;
-      color: white;
-      image-rendering: pixelated;
-      scrollbar-width: none;
-      overflow: hidden;
-    }
-    ::-webkit-scrollbar { display: none; }
+<meta charset="utf-8">
+<title>Super Mario 64</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    font-family: Arial, sans-serif;
+  }
 
-    #container {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+  canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    image-rendering: pixelated;
+    display: block;
+  }
 
-    canvas {
-      width: 100vw;
-      height: 100vh;
-      touch-action: none;
-    }
+  /* --- Mobile Controls --- */
+  #controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* parent ignores touches */
+    z-index: 999;
+  }
 
-    /* Mobile Controller */
-    #mobile-controls {
-      position: fixed;
-      bottom: 10px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: none;
-      z-index: 999;
-    }
+  #dpad, #cstick, #actions, #topControls {
+    pointer-events: auto; /* children are touchable */
+    position: absolute;
+  }
 
-    .dpad, .buttons {
-      display: grid;
-      gap: 10px;
-      pointer-events: auto;
-    }
+  #dpad {
+    bottom: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-template-rows: 60px 60px 60px;
+    gap: 5px;
+  }
+  #dpad .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } /* up */
+  #dpad .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } /* left */
+  #dpad .control-btn:nth-child(5) { grid-column: 2; grid-row: 2; } /* center placeholder */
+  #dpad .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } /* right */
+  #dpad .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } /* down */
 
-    .dpad {
-      grid-template-areas: 
-        ". up ."
-        "left . right"
-        ". down .";
-    }
+  #cstick {
+    bottom: 20px;
+    right: 120px;
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-template-rows: 60px 60px 60px;
+    gap: 5px;
+  }
+  #cstick .control-btn:nth-child(2) { grid-column: 2; grid-row: 1; } /* up */
+  #cstick .control-btn:nth-child(4) { grid-column: 1; grid-row: 2; } /* left */
+  #cstick .control-btn:nth-child(6) { grid-column: 3; grid-row: 2; } /* right */
+  #cstick .control-btn:nth-child(8) { grid-column: 2; grid-row: 3; } /* down */
 
-    .cstick {
-      grid-template-areas:
-        ". cu ."
-        "cl . cr"
-        ". cd .";
-    }
+  #actions {
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .buttons {
-      display: grid;
-      grid-template-areas:
-        "a b"
-        "z r";
-      gap: 10px;
-      margin-right: 20px;
-    }
+  #topControls {
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      user-select: none;
-      touch-action: none;
-    }
+  .control-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid white;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
 
-    .btn:active {
-      background: rgba(255,255,255,0.4);
-    }
-  </style>
+  .control-btn:active {
+    background: rgba(255,255,255,0.5);
+  }
+</style>
 </head>
 <body>
-  <div id="container">
-    <canvas class="emscripten" id="canvas"></canvas>
+<canvas id="canvas"></canvas>
+
+<!-- Mobile Controls -->
+<div id="controls">
+  <!-- Left D-pad for movement -->
+  <div id="dpad">
+    <div></div>
+    <div class="control-btn" data-key="w">↑</div>
+    <div></div>
+    <div class="control-btn" data-key="a">←</div>
+    <div></div>
+    <div class="control-btn" data-key="d">→</div>
+    <div></div>
+    <div class="control-btn" data-key="s">↓</div>
+    <div></div>
   </div>
 
-  <!-- Mobile Controls -->
-  <div id="mobile-controls">
-    <!-- Left D-pad for movement -->
-    <div class="dpad" style="margin-left: 10px;">
-      <div style="grid-area: up;" class="btn" data-key="w">▲</div>
-      <div style="grid-area: left;" class="btn" data-key="a">◀</div>
-      <div style="grid-area: right;" class="btn" data-key="d">▶</div>
-      <div style="grid-area: down;" class="btn" data-key="s">▼</div>
-    </div>
-
-    <!-- Right D-pad for C-stick -->
-    <div class="dpad cstick">
-      <div style="grid-area: cu;" class="btn" data-key="ArrowUp">↑</div>
-      <div style="grid-area: cl;" class="btn" data-key="ArrowLeft">←</div>
-      <div style="grid-area: cr;" class="btn" data-key="ArrowRight">→</div>
-      <div style="grid-area: cd;" class="btn" data-key="ArrowDown">↓</div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="buttons">
-      <div style="grid-area: a;" class="btn" data-key="l">A</div>
-      <div style="grid-area: b;" class="btn" data-key=",">B</div>
-      <div style="grid-area: z;" class="btn" data-key="k">Z</div>
-      <div style="grid-area: r;" class="btn" data-key="ShiftRight">R</div>
-    </div>
-
-    <!-- Start button top-right -->
-    <div class="start-btn" style="position: absolute; top: 10px; right: 10px;">
-      <div class="btn" data-key=" ">Start</div>
-    </div>
+  <!-- Right C-stick -->
+  <div id="cstick">
+    <div></div>
+    <div class="control-btn" data-key="ArrowUp">↑</div>
+    <div></div>
+    <div class="control-btn" data-key="ArrowLeft">←</div>
+    <div></div>
+    <div class="control-btn" data-key="ArrowRight">→</div>
+    <div></div>
+    <div class="control-btn" data-key="ArrowDown">↓</div>
+    <div></div>
   </div>
 
-  <script type='text/javascript'>
-    var Module = {
-      preRun: [],
-      postRun: [],
-      print: function(text) {
-        console.log(text);
-      },
-      printErr: function(text) {
-        console.error(text);
-      },
-      canvas: (function() {
-        var canvas = document.getElementById('canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.addEventListener("webglcontextlost", function(e) {
-          alert('WebGL context lost. Reload page.');
-          e.preventDefault();
-        }, false);
-        return canvas;
-      })(),
-      setStatus: function(text) {}
-    };
+  <!-- Action buttons -->
+  <div id="actions">
+    <div class="control-btn" data-key="l">A</div>
+    <div class="control-btn" data-key=",">B</div>
+    <div class="control-btn" data-key="k">Z</div>
+    <div class="control-btn" data-key="ShiftRight">R</div>
+  </div>
 
-    // Mobile controls handling
-    const activeKeys = new Set();
-    function sendKey(key, type) {
-      const event = new KeyboardEvent(type, { key: key, code: key });
-      document.dispatchEvent(event);
+  <!-- Start button -->
+  <div id="topControls">
+    <div class="control-btn" data-key=" ">Start</div>
+  </div>
+</div>
+
+<script>
+  const activeKeys = new Set();
+  const buttons = document.querySelectorAll('.control-btn');
+
+  function keyCodeFor(code) {
+    switch(code) {
+      case 'w': return 87;
+      case 'a': return 65;
+      case 's': return 83;
+      case 'd': return 68;
+      case 'l': return 76;  // A
+      case ',': return 188; // B
+      case 'k': return 75;  // Z
+      case 'ShiftRight': return 16;
+      case 'ArrowUp': return 38;
+      case 'ArrowDown': return 40;
+      case 'ArrowLeft': return 37;
+      case 'ArrowRight': return 39;
+      case ' ': return 32; // Start
+      default: return 0;
     }
+  }
 
-    document.querySelectorAll('#mobile-controls .btn').forEach(btn => {
-      const key = btn.dataset.key;
-      btn.addEventListener('touchstart', e => {
-        e.preventDefault();
-        if (!activeKeys.has(key)) {
-          activeKeys.add(key);
-          sendKey(key, "keydown");
-        }
-      });
-      btn.addEventListener('touchend', e => {
-        e.preventDefault();
-        if (activeKeys.has(key)) {
-          activeKeys.delete(key);
-          sendKey(key, "keyup");
-        }
-      });
-      // Handle touch cancel / move off button
-      btn.addEventListener('touchcancel', e => {
-        e.preventDefault();
-        if (activeKeys.has(key)) {
-          activeKeys.delete(key);
-          sendKey(key, "keyup");
-        }
-      });
-    });
+  function sendKey(code, type) {
+    const event = new KeyboardEvent(type, { code, key: code });
+    Object.defineProperty(event, 'keyCode', { get: () => keyCodeFor(code) });
+    Object.defineProperty(event, 'which', { get: () => keyCodeFor(code) });
+    window.dispatchEvent(event);
+  }
 
-    // Optional: resize canvas when orientation changes
-    window.addEventListener('resize', () => {
-      Module.canvas.width = window.innerWidth;
-      Module.canvas.height = window.innerHeight;
-    });
-  </script>
+  buttons.forEach(btn => {
+    const key = btn.dataset.key;
 
-  <script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!activeKeys.has(key)) {
+        activeKeys.add(key);
+        sendKey(key, 'keydown');
+      }
+    }, {passive:false});
+
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      if (activeKeys.has(key)) {
+        activeKeys.delete(key);
+        sendKey(key, 'keyup');
+      }
+    }, {passive:false});
+
+    btn.addEventListener('touchcancel', e => {
+      e.preventDefault();
+      if (activeKeys.has(key)) {
+        activeKeys.delete(key);
+        sendKey(key, 'keyup');
+      }
+    }, {passive:false});
+  });
+
+  // Resize canvas
+  const canvas = document.getElementById('canvas');
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+</script>
+
+<script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
 </body>
 </html>
