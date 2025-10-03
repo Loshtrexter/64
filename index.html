@@ -1,97 +1,194 @@
 <!doctype html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Super Mario 64</title>
-    <style>
-      body, html{
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        min-height: 100vh;
-        background-color: #111;
-        font-family: Arial, Helvetica, sans-serif;
-        color: white;
-        image-rendering: pixelated;
-        scrollbar-width: none;
-      }
-      ::-webkit-scrollbar {
-        display: none;
-      }
-      #container {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      canvas {
-        width: 100vw;
-        height: 100vh;
-      }
-      #controls {
-        margin-left: 1em;
-        display: flex;
-        align-items: center;
-      }
-      #controller, #dmca {
-        padding-left: 4em;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="controls">
-      <div id="keyboard">
-        <h2>Keyboard Controls</h2>
-        <ul>
-          <li>Movement: WASD</li>
-          <li>A: L</li>
-          <li>B: ,</li>
-          <li>R: Right Shift</li>
-          <li>Z: K</li>
-          <li>Start: Space</li>
-          <li>C-stick: Arrow Keys</li>
-        </ul>
-      </div>
-      <div id="controller">
-        <h2>Scroll/PgDown to hide, PgUp to show again.</h2>
-      </div>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Super Mario 64</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #111;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      image-rendering: pixelated;
+      scrollbar-width: none;
+      overflow: hidden;
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    #container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+
+    /* Mobile Controller */
+    #mobile-controls {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .dpad, .buttons {
+      display: grid;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .dpad {
+      grid-template-areas: 
+        ". up ."
+        "left . right"
+        ". down .";
+    }
+
+    .cstick {
+      grid-template-areas:
+        ". cu ."
+        "cl . cr"
+        ". cd .";
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-areas:
+        "a b"
+        "z r";
+      gap: 10px;
+      margin-right: 20px;
+    }
+
+    .btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .btn:active {
+      background: rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas class="emscripten" id="canvas"></canvas>
+  </div>
+
+  <!-- Mobile Controls -->
+  <div id="mobile-controls">
+    <!-- Left D-pad for movement -->
+    <div class="dpad" style="margin-left: 10px;">
+      <div style="grid-area: up;" class="btn" data-key="w">▲</div>
+      <div style="grid-area: left;" class="btn" data-key="a">◀</div>
+      <div style="grid-area: right;" class="btn" data-key="d">▶</div>
+      <div style="grid-area: down;" class="btn" data-key="s">▼</div>
     </div>
-    <div id="container">
-      <canvas class="emscripten" id="canvas"></canvas>
+
+    <!-- Right D-pad for C-stick -->
+    <div class="dpad cstick">
+      <div style="grid-area: cu;" class="btn" data-key="ArrowUp">↑</div>
+      <div style="grid-area: cl;" class="btn" data-key="ArrowLeft">←</div>
+      <div style="grid-area: cr;" class="btn" data-key="ArrowRight">→</div>
+      <div style="grid-area: cd;" class="btn" data-key="ArrowDown">↓</div>
     </div>
-    <script type='text/javascript'>
-      var Module = {
-        preRun: [],
-        postRun: [],
-        print: (function() {
-          return function(text) {
-            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-            console.log(text);
-          };
-        })(),
-        printErr: function(text) {
-          if (arguments.length > 1)
-            text = Array.prototype.slice.call(arguments).join(' ');
-          console.error(text);
-        },
-        canvas: (function() {
-          var canvas = document.getElementById('canvas');
-          canvas.width = window.innerWidth; // Todo: how to do this from c++
-          canvas.height = window.innerHeight;
-          canvas.addEventListener("webglcontextlost", function(e) {
-            alert('WebGL context lost. You will need to reload the page.');
-            e.preventDefault();
-          }, false);
-          return canvas;
-        })(),
-        setStatus: function(text) {
+
+    <!-- Action Buttons -->
+    <div class="buttons">
+      <div style="grid-area: a;" class="btn" data-key="l">A</div>
+      <div style="grid-area: b;" class="btn" data-key=",">B</div>
+      <div style="grid-area: z;" class="btn" data-key="k">Z</div>
+      <div style="grid-area: r;" class="btn" data-key="ShiftRight">R</div>
+    </div>
+  </div>
+
+  <script type='text/javascript'>
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: function(text) {
+        console.log(text);
+      },
+      printErr: function(text) {
+        console.error(text);
+      },
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.addEventListener("webglcontextlost", function(e) {
+          alert('WebGL context lost. Reload page.');
+          e.preventDefault();
+        }, false);
+        return canvas;
+      })(),
+      setStatus: function(text) {}
+    };
+
+    // Mobile controls handling
+    const activeKeys = new Set();
+    function sendKey(key, type) {
+      const event = new KeyboardEvent(type, { key: key, code: key });
+      document.dispatchEvent(event);
+    }
+
+    document.querySelectorAll('#mobile-controls .btn').forEach(btn => {
+      const key = btn.dataset.key;
+      btn.addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (!activeKeys.has(key)) {
+          activeKeys.add(key);
+          sendKey(key, "keydown");
         }
-      };
-    </script>
-    <script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
-    <script>
-    </script>
-  </body>
+      });
+      btn.addEventListener('touchend', e => {
+        e.preventDefault();
+        if (activeKeys.has(key)) {
+          activeKeys.delete(key);
+          sendKey(key, "keyup");
+        }
+      });
+      // Handle touch cancel / move off button
+      btn.addEventListener('touchcancel', e => {
+        e.preventDefault();
+        if (activeKeys.has(key)) {
+          activeKeys.delete(key);
+          sendKey(key, "keyup");
+        }
+      });
+    });
+
+    // Optional: resize canvas when orientation changes
+    window.addEventListener('resize', () => {
+      Module.canvas.width = window.innerWidth;
+      Module.canvas.height = window.innerHeight;
+    });
+  </script>
+
+  <script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
+</body>
 </html>
