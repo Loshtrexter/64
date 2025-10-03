@@ -14,6 +14,7 @@
       font-family: Arial, Helvetica, sans-serif;
       color: white;
       image-rendering: pixelated;
+      scrollbar-width: none;
       overflow: hidden;
     }
     ::-webkit-scrollbar { display: none; }
@@ -31,67 +32,54 @@
       width: 100vw;
       height: 100vh;
       touch-action: none;
-      z-index: 0;
     }
 
     /* Mobile Controller */
     #mobile-controls {
       position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
+      bottom: 10px;
       left: 0;
-      z-index: 1000;
-      pointer-events: auto;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 999;
     }
 
-    .dpad, .cstick, .buttons, .start-btn {
+    .dpad, .buttons {
       display: grid;
       gap: 10px;
       pointer-events: auto;
-      position: absolute;
     }
 
-    /* Left movement D-pad */
     .dpad {
       grid-template-areas: 
         ". up ."
         "left . right"
         ". down .";
-      bottom: 10px;
-      left: 10px;
     }
 
-    /* Right C-stick */
     .cstick {
       grid-template-areas:
         ". cu ."
         "cl . cr"
         ". cd .";
-      bottom: 10px;
-      right: 100px;
     }
 
-    /* Action buttons */
     .buttons {
+      display: grid;
       grid-template-areas:
         "a b"
         "z r";
-      bottom: 10px;
-      right: 10px;
-    }
-
-    /* Start button at top right */
-    .start-btn {
-      top: 10px;
-      right: 10px;
+      gap: 10px;
+      margin-right: 20px;
     }
 
     .btn {
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.25); /* more visible */
+      background: rgba(255,255,255,0.15);
       color: white;
       display: flex;
       align-items: center;
@@ -102,11 +90,7 @@
     }
 
     .btn:active {
-      background: rgba(255,255,255,0.45);
-    }
-
-    .btn.start {
-      width: 70px;
+      background: rgba(255,255,255,0.4);
     }
   </style>
 </head>
@@ -117,23 +101,23 @@
 
   <!-- Mobile Controls -->
   <div id="mobile-controls">
-    <!-- Left D-pad -->
-    <div class="dpad">
+    <!-- Left D-pad for movement -->
+    <div class="dpad" style="margin-left: 10px;">
       <div style="grid-area: up;" class="btn" data-key="w">▲</div>
       <div style="grid-area: left;" class="btn" data-key="a">◀</div>
       <div style="grid-area: right;" class="btn" data-key="d">▶</div>
       <div style="grid-area: down;" class="btn" data-key="s">▼</div>
     </div>
 
-    <!-- Right C-stick -->
-    <div class="cstick">
+    <!-- Right D-pad for C-stick -->
+    <div class="dpad cstick">
       <div style="grid-area: cu;" class="btn" data-key="ArrowUp">↑</div>
       <div style="grid-area: cl;" class="btn" data-key="ArrowLeft">←</div>
       <div style="grid-area: cr;" class="btn" data-key="ArrowRight">→</div>
       <div style="grid-area: cd;" class="btn" data-key="ArrowDown">↓</div>
     </div>
 
-    <!-- Action buttons -->
+    <!-- Action Buttons -->
     <div class="buttons">
       <div style="grid-area: a;" class="btn" data-key="l">A</div>
       <div style="grid-area: b;" class="btn" data-key=",">B</div>
@@ -142,8 +126,8 @@
     </div>
 
     <!-- Start button top-right -->
-    <div class="start-btn">
-      <div class="btn start" data-key=" ">Start</div>
+    <div class="start-btn" style="position: absolute; top: 10px; right: 10px;">
+      <div class="btn" data-key=" ">Start</div>
     </div>
   </div>
 
@@ -151,8 +135,12 @@
     var Module = {
       preRun: [],
       postRun: [],
-      print: function(text) { console.log(text); },
-      printErr: function(text) { console.error(text); },
+      print: function(text) {
+        console.log(text);
+      },
+      printErr: function(text) {
+        console.error(text);
+      },
       canvas: (function() {
         var canvas = document.getElementById('canvas');
         canvas.width = window.innerWidth;
@@ -166,7 +154,7 @@
       setStatus: function(text) {}
     };
 
-    // Mobile controls
+    // Mobile controls handling
     const activeKeys = new Set();
     function sendKey(key, type) {
       const event = new KeyboardEvent(type, { key: key, code: key });
@@ -189,6 +177,7 @@
           sendKey(key, "keyup");
         }
       });
+      // Handle touch cancel / move off button
       btn.addEventListener('touchcancel', e => {
         e.preventDefault();
         if (activeKeys.has(key)) {
@@ -198,6 +187,7 @@
       });
     });
 
+    // Optional: resize canvas when orientation changes
     window.addEventListener('resize', () => {
       Module.canvas.width = window.innerWidth;
       Module.canvas.height = window.innerHeight;
